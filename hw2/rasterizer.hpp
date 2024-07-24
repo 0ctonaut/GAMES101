@@ -3,7 +3,7 @@
 //
 
 #pragma once
-
+#define SSAA_SAMPLE 8
 #include <eigen3/Eigen/Eigen>
 #include <algorithm>
 #include "global.hpp"
@@ -93,7 +93,12 @@ namespace rst
         std::vector<Eigen::Vector3f> frame_buf;
 
         std::vector<float> depth_buf;
+
+        std::vector<Eigen::Vector3f> frame_buf_SSAA;
+        std::vector<float> depth_buf_SSAA;
+
         int get_index(int x, int y);
+        int get_index_SSAA(int x, int y);
 
         int width, height;
 

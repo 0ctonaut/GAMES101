@@ -51,6 +51,16 @@ static bool insideTriangle(int x, int y, const Vector3f* _v)
         (AP.cross(BP).z() < 0.0f && BP.cross(CP).z() < 0.0f && CP.cross(AP).z() < 0.0f);
 }
 
+static bool insideTriangleSample(float x, float y, const Vector3f* _v)
+{
+    Vector3f p = Vector3f(x, y, 0);
+    Vector3f AP = Vector3f(_v[0].x(), _v[0].y(), 0) - p;
+    Vector3f BP = Vector3f(_v[1].x(), _v[1].y(), 0) - p;
+    Vector3f CP = Vector3f(_v[2].x(), _v[2].y(), 0) - p;
+    return (AP.cross(BP).z() > 0.0f && BP.cross(CP).z() > 0.0f && CP.cross(AP).z() > 0.0f) ||
+        (AP.cross(BP).z() < 0.0f && BP.cross(CP).z() < 0.0f && CP.cross(AP).z() < 0.0f);
+}
+
 static std::tuple<float, float, float> computeBarycentric2D(float x, float y, const Vector3f* v)
 {
     float c1 = (x*(v[1].y() - v[2].y()) + (v[2].x() - v[1].x())*y + v[1].x()*v[2].y() - v[2].x()*v[1].y()) / (v[0].x()*(v[1].y() - v[2].y()) + (v[2].x() - v[1].x())*v[0].y() + v[1].x()*v[2].y() - v[2].x()*v[1].y());
@@ -127,26 +137,132 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     //z_interpolated *= w_reciprocal;
 
     // TODO : set the current pixel (use the set_pixel function) to the color of the triangle (use getColor function) if it should be painted.
-    
-    for (int x = Xmin; x < Xmax; ++x)
+    enum class EMode
     {
-        for (int y = Ymin; y < Ymax; ++y)
-        {
-            if (insideTriangle(x + 0.5f, y + 0.5f, t.v))
-            {
-                auto [alpha, beta, gamma] = computeBarycentric2D(x, y, t.v);
-                float w_reciprocal = 1.0 / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
-                float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
-                z_interpolated *= w_reciprocal;
+        Normal = 0,
+        MSAA,
+        SSAA
+    };
+    
+    EMode Mode = EMode::SSAA;
 
-                if (z_interpolated < depth_buf[get_index(x, y)])
+    if (Mode == EMode::SSAA)
+    {
+        for (int x = Xmin; x <= Xmax; ++x)
+        {
+            for (int y = Ymin; y <= Ymax; ++y)
+            {
+                for (int i = 0; i < SSAA_SAMPLE; i += 1)
                 {
-                    depth_buf[get_index(x, y)] = z_interpolated;
-                    set_pixel(Vector3f(x, y, 0), t.getColor());
+                    for (int j = 0; j < SSAA_SAMPLE; j += 1)
+                    {
+                        float px = x + (i + 0.5f) / SSAA_SAMPLE;
+                        float py = y + (j + 0.5f) / SSAA_SAMPLE;
+
+                        if (insideTriangleSample(px, py, t.v))
+                        {
+                            auto [alpha, beta, gamma] = computeBarycentric2D(px, py, t.v);
+                            float w_reciprocal = 1.0 / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
+                            float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+                            z_interpolated *= w_reciprocal;
+
+                            int ix = SSAA_SAMPLE * x + i;
+                            int iy = SSAA_SAMPLE * y + j;
+
+                            int Index = get_index_SSAA(ix, iy);
+
+                            if (z_interpolated < depth_buf_SSAA[Index])
+                            {
+                                depth_buf_SSAA[Index] = z_interpolated;
+                                frame_buf_SSAA[Index] = t.getColor();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for (int x = Xmin; x <= Xmax; ++x)
+        {
+            for (int y = Ymin; y <= Ymax; ++y)
+            {
+                Vector3f Color = Vector3f(0, 0, 0);
+                for (int i = 0; i < SSAA_SAMPLE; ++i)
+                {
+                    for (int j = 0; j < SSAA_SAMPLE; ++j)
+                    {
+                        int ix = SSAA_SAMPLE * x + i;
+                        int iy = SSAA_SAMPLE * y + j;
+                        int Index = get_index_SSAA(ix, iy);
+                        Color += frame_buf_SSAA[Index];
+                    }
+                }
+                Color /= SSAA_SAMPLE * SSAA_SAMPLE;
+                set_pixel(Vector3f(x, y, 0), Color);
+            }
+        }
+    }
+    else
+    {
+        for (int x = Xmin; x <= Xmax; ++x)
+        {
+            for (int y = Ymin; y <= Ymax; ++y)
+            {
+                if (Mode == EMode::MSAA)
+                {
+                    int MSAA_SAMPLE = 4;
+                    float MSAAFraction = 0.0f;
+
+                    for (int i = 0; i < MSAA_SAMPLE; i += 1)
+                    {
+                        for (int j = 0; j < MSAA_SAMPLE; j += 1)
+                        {
+                            float px = x + (i + 0.5f) / MSAA_SAMPLE;
+                            float py = y + (j + 0.5f) / MSAA_SAMPLE;
+
+                            if (insideTriangleSample(px, py, t.v))
+                            {
+                                MSAAFraction += 1.0f;
+                            }
+                        }
+                    }
+                    if (MSAAFraction > 0)
+                    {
+                        auto [alpha, beta, gamma] = computeBarycentric2D(x + 0.5f, y + 0.5f, t.v);
+                        float w_reciprocal = 1.0 / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
+                        float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+                        z_interpolated *= w_reciprocal;
+
+                        int Index = get_index(x, y);
+
+                        if (z_interpolated < depth_buf[Index])
+                        {
+                            depth_buf[Index] = z_interpolated;
+                            set_pixel(Vector3f(x, y, 0), t.getColor() / (1.0f * MSAA_SAMPLE * MSAA_SAMPLE) * MSAAFraction);
+                        }
+                    }
+                }
+                else
+                {
+                    if (insideTriangle(x + 0.5f, y + 0.5f, t.v))
+                    {
+                        auto [alpha, beta, gamma] = computeBarycentric2D(x + 0.5f, y + 0.5f, t.v);
+                        float w_reciprocal = 1.0 / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
+                        float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+                        z_interpolated *= w_reciprocal;
+
+                        int Index = get_index(x, y);
+
+                        if (z_interpolated < depth_buf[Index])
+                        {
+                            depth_buf[Index] = z_interpolated;
+                            set_pixel(Vector3f(x, y, 0), t.getColor());
+                        }
+                    }
                 }
             }
         }
     }
+    int a = 1;
 }
 
 void rst::rasterizer::set_model(const Eigen::Matrix4f& m)
@@ -169,10 +285,12 @@ void rst::rasterizer::clear(rst::Buffers buff)
     if ((buff & rst::Buffers::Color) == rst::Buffers::Color)
     {
         std::fill(frame_buf.begin(), frame_buf.end(), Eigen::Vector3f{0, 0, 0});
+        std::fill(frame_buf_SSAA.begin(), frame_buf_SSAA.end(), Eigen::Vector3f{ 0, 0, 0 });
     }
     if ((buff & rst::Buffers::Depth) == rst::Buffers::Depth)
     {
         std::fill(depth_buf.begin(), depth_buf.end(), std::numeric_limits<float>::infinity());
+        std::fill(depth_buf_SSAA.begin(), depth_buf_SSAA.end(), std::numeric_limits<float>::infinity());
     }
 }
 
@@ -180,6 +298,9 @@ rst::rasterizer::rasterizer(int w, int h) : width(w), height(h)
 {
     frame_buf.resize(w * h);
     depth_buf.resize(w * h);
+
+    frame_buf_SSAA.resize(w * h * SSAA_SAMPLE * SSAA_SAMPLE);
+    depth_buf_SSAA.resize(w * h * SSAA_SAMPLE * SSAA_SAMPLE);
 }
 
 int rst::rasterizer::get_index(int x, int y)
@@ -193,6 +314,11 @@ void rst::rasterizer::set_pixel(const Eigen::Vector3f& point, const Eigen::Vecto
     auto ind = (height-1-point.y())*width + point.x();
     frame_buf[ind] = color;
 
+}
+
+int rst::rasterizer::get_index_SSAA(int x, int y)
+{
+    return ((height * SSAA_SAMPLE) - 1 - y) * (width * SSAA_SAMPLE) + x;
 }
 
 // clang-format on
