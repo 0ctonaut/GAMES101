@@ -399,3 +399,7 @@ FodyWeavers.xsd
 
 #custom
 3dparty
+[Bb]in
+[Bb]in-int
+*.sln
+**/*.vcxproj

@@ -3,7 +3,6 @@
 //
 
 #pragma once
-#define SSAA_SAMPLE 8
 #include <eigen3/Eigen/Eigen>
 #include <algorithm>
 #include "global.hpp"
