@@ -1,10 +1,10 @@
-project "hw1"
+project "lab1"
    kind "ConsoleApp"
    language "C++"
    cppdialect "C++17"
 
-   targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}") -- bin/Debug-Windows-x64/
-   objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}") -- bin-int/Debug-Windows-x64/
+   targetdir ("%{wks.location}/Bin/bin/" .. outputdir .. "/%{prj.name}") -- bin/Debug-Windows-x64/
+   objdir ("%{wks.location}/Bin/bin-int/" .. outputdir .. "/%{prj.name}") -- bin-int/Debug-Windows-x64/
 
    files 
    { 
