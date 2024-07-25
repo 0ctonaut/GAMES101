@@ -139,7 +139,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     // TODO : set the current pixel (use the set_pixel function) to the color of the triangle (use getColor function) if it should be painted.
     enum class EMode
     {
-        Normal = 0,
+        Naive = 0,
         MSAA,
         SSAA
     };

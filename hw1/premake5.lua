@@ -8,9 +8,9 @@ project "hw1"
 
    files 
    { 
-      "**.h",
-      "**.hpp",
-      "**.cpp",
+      "src/**.h",
+      "src/**.hpp",
+      "src/**.cpp",
    }
 
    includedirs
