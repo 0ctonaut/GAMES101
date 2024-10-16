@@ -262,7 +262,6 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
             }
         }
     }
-    int a = 1;
 }
 
 void rst::rasterizer::set_model(const Eigen::Matrix4f& m)

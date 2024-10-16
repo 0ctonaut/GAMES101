@@ -8,7 +8,14 @@
 
 | Naive | MSAA | SSAA |
 | :---: | :---: | :---: |
-| ![Naive](/images/hw2_Naive.png) | ![MSAA](/images/hw2_4xMSAA.png) |![SSAA](/images/hw2_4xSSAA.png)|
+| ![Naive](/images/lab2_Naive.png) | ![MSAA](/images/lab2_4xMSAA.png) |![SSAA](/images/lab2_4xSSAA.png)|
+
+### hw3
+
+| normal | phong | texture | bump | displacement |
+| :---: | :---: | :---: | :---: | :---: |
+| ![normal](/images/lab3_normal.png) | ![phong](/images/lab3_phong.png) | ![texture](/images/lab3_texture.png) | ![bump](/images/lab3_bump.png) | ![displacement](/images/lab3_displacement.png) |
+
 
 
 
