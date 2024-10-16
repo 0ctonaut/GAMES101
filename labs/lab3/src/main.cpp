@@ -1,6 +1,8 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
+#define BILINEAR
+
 #include "global.hpp"
 #include "rasterizer.hpp"
 #include "Triangle.hpp"
