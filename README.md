@@ -14,11 +14,15 @@
 
 Ignored.
 
+---
+
 ### hw2
 
 | Naive | MSAA | SSAA |
 | :---: | :---: | :---: |
 | ![Naive](/images/lab2_Naive.png) | ![MSAA](/images/lab2_4xMSAA.png) |![SSAA](/images/lab2_4xSSAA.png)|
+
+---
 
 ### hw3
 
@@ -34,6 +38,17 @@ Bilinear interpolation implemented:
 | 1024x1024 | ![naive](/images/lab3_texture.png) | ![bilinear](/images/lab3_texture_bilinear.png) |
 | 512x512 | ![naive](/images/lab3_texture_512x512.png) | ![bilinear](/images/lab3_texture_512x512_bilinear.png) |
 
+### hw4
+
+Ignored.
+
+---
+
+### hw5
+
+Whitted-Style Ray Tracing:
+
+![image](/images/lab5_whitted.png)
 
 
 
