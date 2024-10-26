@@ -96,7 +96,59 @@ inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
     // invDir: ray direction(x,y,z), invDir=(1.0/x,1.0/y,1.0/z), use this because Multiply is faster that Division
     // dirIsNeg: ray direction(x,y,z), dirIsNeg=[int(x>0),int(y>0),int(z>0)], use this to simplify your logic
     // TODO test if ray bound intersects
-    
+
+    //float t_enter = -std::numeric_limits<float>::infinity();
+    //float t_exit = std::numeric_limits<float>::infinity();
+
+    //for (int i = 0; i < 3; ++i)
+    //{
+    //    float min = (pMin[i] - ray.origin[i]) * invDir[i];
+    //    float max = (pMax[i] - ray.origin[i]) * invDir[i];
+
+    //    if (dirIsNeg[i] == 0)
+    //    {
+    //        std::swap(min, max);
+    //    }
+    //    t_enter = std::max(t_enter, min);
+    //    t_exit = std::max(t_exit, max);
+    //}
+    //
+    //return t_enter < t_exit && t_exit >= 0;
+
+    Vector3f tmin = (pMin - ray.origin) * invDir;
+    Vector3f tmax = (pMax - ray.origin) * invDir;
+
+    float txmin = dirIsNeg[0]? tmin.x : tmax.x;
+    float txmax = dirIsNeg[0]? tmax.x : tmin.x;
+    float tymin = dirIsNeg[1]? tmin.y : tmax.y;
+    float tymax = dirIsNeg[1]? tmax.y : tmin.y;
+    float tzmin = dirIsNeg[2]? tmin.z : tmax.z;
+    float tzmax = dirIsNeg[2]? tmax.z : tmin.z;
+
+    float t_enter = std::max(std::max(txmin, tymin), tzmin);
+    float t_exit = std::min(std::min(txmax, tymax), tzmax);
+
+    //float t_enter = -std::numeric_limits<float>::infinity();
+    //float t_exit = std::numeric_limits<float>::infinity();
+
+    //for (int i = 0; i < 3; ++i)
+    //{
+    //    float min = tmin[i];
+    //    float max = tmax[i];
+
+    //    if (!dirIsNeg[i])
+    //    {
+    //        t_enter = std::max(t_enter, max);
+    //        t_exit = std::max(t_exit, min);
+    //    }
+    //    else
+    //    {
+    //        t_enter = std::max(t_enter, min);
+    //        t_exit = std::max(t_exit, max);
+    //    }
+    //}
+
+    return t_enter < t_exit && t_exit >= 0;
 }
 
 inline Bounds3 Union(const Bounds3& b1, const Bounds3& b2)
