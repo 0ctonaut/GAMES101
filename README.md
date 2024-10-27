@@ -6,9 +6,13 @@
 
 2. Run `vendor/premake/premake5.exe` to generate the solution file for visual studio 2022.
 
+---
+
 ## LABS
 
 [All labs](https://games-cn.org/forums/topic/allhw/)
+
+---
 
 ### hw1 
 
@@ -38,6 +42,8 @@ Bilinear interpolation implemented:
 | 1024x1024 | ![naive](/images/lab3_texture.png) | ![bilinear](/images/lab3_texture_bilinear.png) |
 | 512x512 | ![naive](/images/lab3_texture_512x512.png) | ![bilinear](/images/lab3_texture_512x512_bilinear.png) |
 
+---
+
 ### hw4
 
 Ignored.
@@ -49,6 +55,8 @@ Ignored.
 Whitted-Style Ray Tracing:
 
 ![image](/images/lab5_whitted.png)
+
+---
 
 ### hw6
 
