@@ -12,7 +12,8 @@ BVHAccel::BVHAccel(std::vector<Object*> p, int maxPrimsInNode,
     if (primitives.empty())
         return;
 
-    root = recursiveBuild(primitives);
+    // root = recursiveBuild(primitives);
+    root = recursiveBuildBySAH(primitives);
 
     time(&stop);
     double diff = difftime(stop, start);
@@ -128,4 +129,84 @@ Intersection BVHAccel::getIntersection(BVHBuildNode* node, const Ray& ray) const
     {
         return Intersection();
     }
+}
+
+// SAH
+float BVHAccel::computeSAHCost(const Bounds3& parentBox, const Bounds3& leftBox, const Bounds3& rightBox, int leftCount, int rightCount) const {
+    float parentArea = parentBox.SurfaceArea();
+    float leftArea = leftBox.SurfaceArea();
+    float rightArea = rightBox.SurfaceArea();
+
+    // 表面面积比例
+    float Pl = leftArea / parentArea;
+    float Pr = rightArea / parentArea;
+
+    // 假设遍历代价和相交测试代价分别为 1，这可以根据实际情况调整
+    float traversalCost = 1.0f;
+    float intersectionCost = 1.0f;
+
+    return traversalCost + (Pl * leftCount + Pr * rightCount) * intersectionCost;
+}
+
+BVHBuildNode* BVHAccel::recursiveBuildBySAH(std::vector<Object*> objects)
+{
+    BVHBuildNode* node = new BVHBuildNode();
+
+    // Compute bounds of all primitives in BVH node
+    Bounds3 bounds;
+    for (int i = 0; i < objects.size(); ++i)
+    {
+        bounds = Union(bounds, objects[i]->getBounds());
+    }
+
+    if (objects.size() <= maxPrimsInNode)
+    {
+        node->bounds = bounds;
+        node->object = objects[0];
+        node->left = nullptr;
+        node->right = nullptr;
+        return node;
+    }
+
+    Bounds3 centroidBounds;
+    for (int i = 0; i < objects.size(); ++i)
+    {
+        centroidBounds = Union(centroidBounds, objects[i]->getBounds().Centroid());
+    }
+
+    int dim = centroidBounds.maxExtent();
+    std::sort(objects.begin(), objects.end(), [dim](Object* a, Object* b) {
+        return a->getBounds().Centroid()[dim] < b->getBounds().Centroid()[dim];
+    });
+
+    float minCost = std::numeric_limits<float>::infinity();
+    int bestSplit = 0;
+    Bounds3 leftBounds, rightBounds;
+
+    // 尝试每个分割位置
+    for (int i = 1; i < objects.size(); ++i) {
+        Bounds3 leftBoundsTemp, rightBoundsTemp;
+        for (int j = 0; j < i; ++j)
+            leftBoundsTemp = Union(leftBoundsTemp, objects[j]->getBounds());
+        for (int j = i; j < objects.size(); ++j)
+            rightBoundsTemp = Union(rightBoundsTemp, objects[j]->getBounds());
+
+        float cost = computeSAHCost(bounds, leftBoundsTemp, rightBoundsTemp, i, objects.size() - i);
+
+        if (cost < minCost) {
+            minCost = cost;
+            bestSplit = i;
+            leftBounds = leftBoundsTemp;
+            rightBounds = rightBoundsTemp;
+        }
+    }
+
+    auto leftshapes = std::vector<Object*>(objects.begin(), objects.begin() + bestSplit);
+    auto rightshapes = std::vector<Object*>(objects.begin() + bestSplit, objects.end());
+
+    node->left = recursiveBuildBySAH(leftshapes);
+    node->right = recursiveBuildBySAH(rightshapes);
+    node->bounds = Union(leftBounds, rightBounds);
+
+    return node;
 }

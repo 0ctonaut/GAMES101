@@ -39,6 +39,9 @@ public:
 
     // BVHAccel Private Methods
     BVHBuildNode* recursiveBuild(std::vector<Object*>objects);
+    BVHBuildNode* recursiveBuildBySAH(std::vector<Object*>objects);
+    float computeSAHCost(const Bounds3& parentBox, const Bounds3& leftBox, const Bounds3& rightBox, int leftCount, int rightCount) const;
+
 
     // BVHAccel Private Data
     const int maxPrimsInNode;

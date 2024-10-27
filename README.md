@@ -50,6 +50,14 @@ Whitted-Style Ray Tracing:
 
 ![image](/images/lab5_whitted.png)
 
+### hw6
 
+Whitted-Style Ray Tracing with acceleration: 
 
+| | BVH | SAH |
+| :---: | :---: | :---: |
+| BVH Generation time(secs)| 0 | 13 |
+| Rendering time(secs) | 4 | 4 |
+
+![image](/images/lab6_BVH.png)
 
