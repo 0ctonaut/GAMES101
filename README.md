@@ -52,9 +52,9 @@ Whitted-Style Ray Tracing:
 
 ### hw6
 
-Whitted-Style Ray Tracing with acceleration: 
+Whitted-Style Ray Tracing with BVH acceleration: 
 
-| | BVH | SAH |
+| | Middle Split | SAH |
 | :---: | :---: | :---: |
 | BVH Generation time(secs)| 0 | 13 |
 | Rendering time(secs) | 4 | 4 |
