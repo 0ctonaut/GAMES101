@@ -7,7 +7,10 @@
 
 #include "Vector.hpp"
 
-enum MaterialType { DIFFUSE};
+enum MaterialType { 
+    DIFFUSE,
+    MICROFACET,
+};
 
 class Material{
 private:
@@ -142,6 +145,11 @@ Vector3f Material::sample(const Vector3f &wi, const Vector3f &N){
             
             break;
         }
+        case MICROFACET:
+        {
+
+            break;
+        }
     }
 }
 
@@ -154,6 +162,11 @@ float Material::pdf(const Vector3f &wi, const Vector3f &wo, const Vector3f &N){
                 return 0.5f / M_PI;
             else
                 return 0.0f;
+            break;
+        }
+        case MICROFACET:
+        {
+
             break;
         }
     }
@@ -171,6 +184,11 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
             }
             else
                 return Vector3f(0.0f);
+            break;
+        }
+        case MICROFACET:
+        {
+
             break;
         }
     }
