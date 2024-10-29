@@ -14,25 +14,32 @@
 
 ---
 
-### hw1 
+### lab1 
 
 Ignored.
 
 ---
 
-### hw2
+### lab2
 
-| Naive | MSAA | SSAA |
-| :---: | :---: | :---: |
-| ![Naive](/images/lab2_Naive.png) | ![MSAA](/images/lab2_4xMSAA.png) |![SSAA](/images/lab2_4xSSAA.png)|
+|||
+| :---: | :---: |
+| Naive | ![Naive](/images/lab2_Naive.png) |
+| MSAA | ![MSAA](/images/lab2_4xMSAA.png) |
+| SSAA | ![SSAA](/images/lab2_4xSSAA.png) |
 
 ---
 
-### hw3
+### lab3
 
-| normal | phong | texture | bump | displacement |
-| :---: | :---: | :---: | :---: | :---: |
-| ![normal](/images/lab3_normal.png) | ![phong](/images/lab3_phong.png) | ![texture](/images/lab3_texture.png) | ![bump](/images/lab3_bump.png) | ![displacement](/images/lab3_displacement.png) |
+| | |
+| :---: | :---: |
+| normal | ![normal](/images/lab3_normal.png) |
+| phong | ![phong](/images/lab3_phong.png) |
+| texture | ![texture](/images/lab3_texture.png) |
+| bump | ![bump](/images/lab3_bump.png) |
+| displacement | ![displacement](/images/lab3_displacement.png) |
+
 
 
 Bilinear interpolation implemented:
@@ -44,21 +51,21 @@ Bilinear interpolation implemented:
 
 ---
 
-### hw4
+### lab4
 
 Ignored.
 
 ---
 
-### hw5
+### lab5
 
 Whitted-Style Ray Tracing:
 
-![image](/images/lab5_whitted.png)
+![whitted](/images/lab5_whitted.png)
 
 ---
 
-### hw6
+### lab6
 
 Whitted-Style Ray Tracing with BVH acceleration: 
 
@@ -67,5 +74,15 @@ Whitted-Style Ray Tracing with BVH acceleration:
 | BVH Generation time(secs)| 0 | 13 |
 | Rendering time(secs) | 4 | 4 |
 
-![image](/images/lab6_BVH.png)
+![BVH](/images/lab6_BVH.png)
 
+### lab7
+
+Path Tracing:
+
+| spp | |
+| :---: | :---: |
+| 1 | ![spp1](/images/lab7_spp1.png) |
+| 2 | ![spp4](/images/lab7_spp2.png) |
+| 4 | ![spp4](/images/lab7_spp4.png) |
+| 16 | ![spp16](/images/lab7_spp16.png) |
